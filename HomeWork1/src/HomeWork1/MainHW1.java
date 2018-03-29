@@ -42,15 +42,27 @@ public class MainHW1 {
 	public static void main(String[] args) throws Exception {
 		
 		//load data
-		Instances data = loadData("wind_training.txt");
-		
-		LinearRegression test = new LinearRegression();
-		test.buildClassifier(data);
-		
-		
-		//find best alpha and build classifier with all attributes
+    Instances data = loadData("wind_training.txt");
+				
+    LinearRegression test = new LinearRegression();
+	test.buildClassifier(data);	//find best alpha and build classifier with all attributes
 
+	
+     Instances testData = loadData("wind_testing.txt");
+		
+		
+	LinearRegression test2 = new LinearRegression();
+	test2.buildClassifier(testData);
+	
    		//build classifiers with all 3 attributes combinations
+	
+	
+	
+	//-------------------to erase befor submission ----------------------
+	//Instances dbugdata = loadData("wind_training -smallset.txt");
+	//LinearRegression test2 = new LinearRegression();
+	//test2.buildClassifier(dbugdata);
+    //test2.gradientDescent(dbugdata);
 		
 	}
 
