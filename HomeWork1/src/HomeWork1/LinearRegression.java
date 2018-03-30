@@ -15,7 +15,7 @@ public class LinearRegression implements Classifier {
     private double[] m_coefficients;
     private double[] m_firstTeta;
     private double m_alpha;
-    private Attribute[] m_best3Atts;
+    private int[] m_best3Atts;
     private double m_err;
 
     // the method which runs to train the linear regression predictor, i.e.
@@ -66,11 +66,6 @@ public class LinearRegression implements Classifier {
                 m_err = calculateMSE(trainingData);
             }
         }
-    }
-
-
-    public double getError() {
-        return m_err;
     }
 
     private void findAlpha(Instances data) throws Exception {
@@ -195,7 +190,7 @@ public class LinearRegression implements Classifier {
     // Generate trio's to identify best attributes subset
 
     public void findBestTrio(Instances data, double alpha) throws Exception {
-        m_best3Atts = new Attribute[3];
+        m_best3Atts = new int[3];
         m_alpha = alpha;
         Instances tmpData;
         int tmpTruNumAttributes = data.get(0).numAttributes();
@@ -214,16 +209,16 @@ public class LinearRegression implements Classifier {
                     buildClassifier(tmpData);
                     if (calculateMSE(tmpData) < err) {
                         err = calculateMSE(tmpData);
-                        m_best3Atts[0] = data.attribute(i);
-                        m_best3Atts[1] = data.attribute(j);
-                        m_best3Atts[2] = data.attribute(k);
+                        m_best3Atts[0] = i;
+                        m_best3Atts[1] = j;
+                        m_best3Atts[2] = k;
                     }
                     System.out.println(" --> Combination error is: " + calculateMSE(tmpData));
                 }
             }
         }
-        System.out.println("Training error of the best features " + m_best3Atts[0].name() + " "
-                + m_best3Atts[1].toString() + " " + m_best3Atts[2].toString() + ": " + err);
+        System.out.println("Training error of the best features " + data.get(0).attribute(m_best3Atts[0]).name() + " "
+                + data.get(0).attribute(m_best3Atts[1]).name() + " " + data.get(0).attribute(m_best3Atts[2]).name() + ": " + err);
     }
 
     private static Instances dataSubset(Instances data, int[] attIndex) throws Exception {
@@ -241,6 +236,27 @@ public class LinearRegression implements Classifier {
 
     public double getAlpha() {
         return m_alpha;
+    }
+
+    public double getError() {
+        return m_err;
+    }
+
+    public int[] getIndexes() {
+        return m_best3Atts;
+    }
+
+    public void testError(Instances data, int[] attIndex, double alpha) throws Exception {
+        m_alpha = alpha;
+        int[] attIndexNew = new int[4];
+        for (int i = 0; i < attIndex.length; i++) {
+            attIndexNew[i] = attIndex[i];
+        }
+        attIndexNew[3] = data.get(0).numAttributes() - 1;
+        Instances minData = dataSubset(data, attIndexNew);
+        buildClassifier(minData);
+        System.out.println("Test error of the best features " + data.get(0).attribute(attIndex[0]).name() + " "
+                + data.get(0).attribute(attIndex[1]).name() + " " + data.get(0).attribute(attIndex[2]).name() + ": " + m_err);
     }
 
     @Override

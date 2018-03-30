@@ -65,11 +65,12 @@ public class MainHW1 {
         LinearRegression trainTrios = new LinearRegression();
         trainTrios.findBestTrio(trioData, test.getAlpha());
 
-        //build classifiers with all 3 attributes combinations
+        //get test error for best 3 features
         Instances trioTestData = loadData("wind_testing.txt");
 
+
         LinearRegression testTrios = new LinearRegression();
-        testTrios.findBestTrio(trioTestData, test.getAlpha());
+        testTrios.testError(trioTestData, trainTrios.getIndexes(), test.getAlpha());
 
     }
 
