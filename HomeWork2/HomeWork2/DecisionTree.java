@@ -23,7 +23,7 @@ public class DecisionTree implements Classifier {
 	private int classIndex;
 	private double gini_index;
 	private double entropy_index;
-	private boolean usingGini;
+	private boolean usingGini; //added by orr
 
 	@Override
 	public void buildClassifier(Instances arg0) throws Exception {
@@ -32,8 +32,8 @@ public class DecisionTree implements Classifier {
 		Queue<Node> queue = new LinkedList<Node>();
 		//make the root node
 		Node root  = new Node();
-		root.attributeIndex = getBestAttribute();
-		root.children = createChildrenNodesByAtribute(arg0, root.attributeIndex);
+		root.attributeIndex = getBestAttribute(arg0);
+		root.children = createChildrenNodesByAtribute(root,arg0, root.attributeIndex);
 		root.returnValue = maxClass(arg0);
 		//insert all the children into the queue
 		for(Node child : root.children){
@@ -48,8 +48,8 @@ public class DecisionTree implements Classifier {
 				toProcces.done = true;
 			}else{
 				//else 1.find best atrribute 2.split data into children 3.for loop creat children with sub data and put in queue 
-				toProcces.attributeIndex = getBestAttribute();
-				toProcces.children = createChildrenNodesByAtribute(toProcces.data, toProcces.attributeIndex);
+				toProcces.attributeIndex = getBestAttribute(toProcces.data);
+				toProcces.children = createChildrenNodesByAtribute(toProcces,toProcces.data, toProcces.attributeIndex);
 				toProcces.returnValue = maxClass(toProcces.data); 
 				//insert all the children into the queue
 				for(Node child : toProcces.children){
@@ -58,7 +58,7 @@ public class DecisionTree implements Classifier {
 				}
 			}
 		}
-//possible optimiztian add a clean up to clear all the data from the nodes 
+		//possible optimiztian add a clean up to clear all the data from the nodes 
 	}
 
 	//a method that determines if a group of instances is monochromatic
@@ -67,8 +67,8 @@ public class DecisionTree implements Classifier {
 		return ( instancesOfclass0.size() == 0 || instancesOfclass0.size() == data.size() ) ;
 	}
 
-	
-	//a methode that returns the class with the most instances in a given group
+
+	//a method that returns the class with the most instances in a given group
 	private double maxClass(Instances data) {
 		Instances instancesOfclass0 = getAllInstancesWithSameValue(data, classIndex, 0.0);
 		Instances instancesOfclass1 = getAllInstancesWithSameValue(data, classIndex, 1.0);
@@ -79,22 +79,41 @@ public class DecisionTree implements Classifier {
 		}
 	}
 
-	
-	private Node[] createChildrenNodesByAtribute(Instances data, int attributeIndex) {
-		// TODO not finshed yet -orr
+
+	private Node[] createChildrenNodesByAtribute(Node parent,Instances data, int attributeIndex) {
 		double[] classes = data.attributeToDoubleArray(attributeIndex);
-				
-		return null;
+		Node[] children = new Node[classes.length];
+		for (int i = 0; i < classes.length; i++){
+			Instances subset = getAllInstancesWithSameValue(data, attributeIndex, i);
+			//create the child with the relevant subsetdata 
+			Node child = new Node();
+			child.data = subset;
+			child.parent = parent;
+			//insert to children array 
+			children[i] = child; 
+		}
+		return children;
 	}
 
-	private int getBestAttribute() {
+	private int getBestAttribute(Instances data) {
 		// This will use the usinggini flag to determine which to use
-		return 0;
+		int bestAtribute;
+		if(this.usingGini){
+			bestAtribute = getGiniGain(data);//need to be validated by dani 
+		}else{
+			bestAtribute = getEntropyGain(data);//need to be validated by dani
+		}
+		return bestAtribute;
 	}
 
 	@Override
 	public double classifyInstance(Instance instance) {
-		return 0;
+		
+		Node current = this.rootNode;
+		while(current.children != null){
+			current = current.children[(int) instance.value(current.attributeIndex)];
+		}
+		return current.returnValue;
 	}
 
 	private double getGiniIndex(Instances data, Attribute attr) {
