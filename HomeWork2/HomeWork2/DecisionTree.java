@@ -213,12 +213,14 @@ public class DecisionTree implements Classifier {
 	// tested 
 	public Instances getAllInstancesWithSameValue(Instances data, int attributeIndex, double targetValue) {
 
+		Instances filltered = new Instances(data);
+		
 		for (int i = (data.size() - 1 ); i >= 0; i--) {
 			if (data.instance(i).value(attributeIndex) != targetValue) {
-				data.remove(data.get(i));
+				filltered.remove(i);
 			}
 		}
-		return data;
+		return filltered;
 	}
 
 	
