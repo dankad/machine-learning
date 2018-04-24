@@ -8,15 +8,35 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
 class DistanceCalculator {
+
+    private boolean m_Efficient;
+    private boolean m_Infinity;
+    private int m_PValue;
+
+    // constructor for the distance calculator object
+    public DistanceCalculator(int p, boolean efficient, boolean infinity) {
+        m_Efficient = efficient;
+        m_Infinity = infinity;
+        m_PValue = p;
+    }
+
     /**
      * We leave it up to you whether you want the distance method to get all relevant
      * parameters(lp, efficient, etc..) or have it as a class variables.
      */
 
-    private int m_PValue;
-
     public double distance(Instance one, Instance two) {
-        return 0.0;
+        double result = 0;
+        if (!m_Infinity && !m_Efficient) {
+            result = lpDistance(one, two);
+        } else if (m_Infinity && !m_Efficient) {
+            result = lInfinityDistance(one, two);
+        } else if (!m_Infinity && m_Efficient) {
+            result = efficientLInfinityDistance(one, two);
+        } else if (m_Infinity && m_Efficient) {
+            result = efficientLInfinityDistance(one, two);
+        }
+        return result;
     }
 
     /**
@@ -78,11 +98,18 @@ class DistanceCalculator {
 
 public class Knn implements Classifier {
 
-    public enum DistanceCheck {Regular, Efficient}
 
-    public int m_k;
+    //public enum DistanceCheck{Regular, Efficient}
 
     private Instances m_trainingInstances;
+    private boolean useWeight;
+
+    //all distances related fields
+    private DistanceCalculator m_DistanceCalculator;
+    private int m_PValue;
+    private boolean m_InfinityP;
+    private boolean m_Efficient;
+    private int m_k;
 
     @Override
     /**
@@ -91,6 +118,10 @@ public class Knn implements Classifier {
      * @param instances
      */
     public void buildClassifier(Instances instances) throws Exception {
+        //need to check if more fields are needed - p distancecheck ect
+        //we might be missing something
+        this.m_trainingInstances = instances;
+        this.m_DistanceCalculator = new DistanceCalculator(m_PValue, m_InfinityP, m_Efficient);
     }
 
     /**
@@ -100,7 +131,13 @@ public class Knn implements Classifier {
      * @return The instance predicted value.
      */
     public double regressionPrediction(Instance instance) {
-        return 0.0;
+        int[] kNearestIndex = findNearestNeighbors(instance);
+        double answer;
+
+        //use average class or weighted method to calculate class
+        answer = !useWeight ? getAverageValue(kNearestIndex) : getWeightedAverageValue(kNearestIndex);
+
+        return answer;
     }
 
     /**
@@ -108,21 +145,21 @@ public class Knn implements Classifier {
      * The average error is the average absolute error between the target value and the predicted
      * value across all insatnces.
      *
-     * @param insatnces
+     * @param instances
      * @return
      */
-    public double calcAvgError(Instances insatnces) {
+    public double calcAvgError(Instances instances) {
         return 0.0;
     }
 
     /**
      * Calculates the cross validation error, the average error on all folds.
      *
-     * @param insances     Insances used for the cross validation
+     * @param instances    Insances used for the cross validation
      * @param num_of_folds The number of folds to use.
      * @return The cross validation error.
      */
-    public double crossValidationError(Instances insances, int num_of_folds) {
+    public double crossValidationError(Instances instances, int num_of_folds) {
         return 0.0;
     }
 
@@ -139,7 +176,7 @@ public class Knn implements Classifier {
 
         // calculate the distance of @instance from all instance in the data set
         for (int i = 0; i < m_trainingInstances.size(); i++) {
-            tempDist = lpDistance(instance, m_trainingInstances.instance(i));
+            tempDist = m_DistanceCalculator.distance(instance, m_trainingInstances.instance(i));
             if (tempDist != 0) {
                 distForNeighbors[i][0] = i;
                 distForNeighbors[i][1] = tempDist;
@@ -174,7 +211,7 @@ public class Knn implements Classifier {
      * @param
      * @return
      */
-    public double getAverageValue(/* Collection of your choice */) {
+    public double getAverageValue(int[] kNearest) {
         return 0.0;
     }
 
@@ -184,7 +221,7 @@ public class Knn implements Classifier {
      *
      * @return
      */
-    public double getWeightedAverageValue(/* Collection of your choice */) {
+    public double getWeightedAverageValue(int[] kNearest) {
         return 0.0;
     }
 
