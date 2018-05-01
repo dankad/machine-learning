@@ -134,7 +134,7 @@ public class Knn implements Classifier {
     private boolean m_Efficient;
     private int m_k;
 
-    public Knn (boolean weight, int PValue, boolean infinity, int k, boolean efficient) {
+    public Knn(boolean weight, int PValue, boolean infinity, int k, boolean efficient) {
         useWeight = weight;
         m_PValue = PValue;
         m_InfinityP = infinity;
@@ -162,6 +162,7 @@ public class Knn implements Classifier {
      */
     public double regressionPrediction(Instance instance) {
         int[] kNearestIndex = findNearestNeighbors(instance);
+        System.out.println("k index is: " + kNearestIndex[0]);
         double answer;
 
         //use average class or weighted method to calculate class
@@ -181,10 +182,14 @@ public class Knn implements Classifier {
     public double calcAvgError(Instances instances) {
         double numberOfErrors = 0;
         for (int i = 0; i < instances.size(); i++) {
+            System.out.println("regressionPrediction is " + regressionPrediction(instances.get(i)));
+            System.out.println("class value: " + instances.get(i).classValue());
             if (regressionPrediction(instances.get(i)) != instances.get(i).classValue()) {
                 numberOfErrors++;
             }
         }
+        System.out.println("Number of errors: " + numberOfErrors);
+        System.out.println("Instances size: " + instances.size());
         return numberOfErrors / instances.size();
     }
 
@@ -208,10 +213,12 @@ public class Knn implements Classifier {
             folds.setInputFormat(instances);
             folds.setInvertSelection(true);
             trainingData = Filter.useFilter(instances, folds);
+
             //create new testing data for cross validation .
             folds.setInputFormat(instances);
             folds.setInvertSelection(false);
             testData = Filter.useFilter(instances, folds);
+
             buildClassifier(trainingData);
             sumErrors += calcAvgError(testData);
         }
@@ -234,7 +241,7 @@ public class Knn implements Classifier {
             distForNeighbors[i][1] = Double.MAX_VALUE;
         }
 
-        // calculate the distance of @instance from all instance in the data set
+        // calculate the distance of @instance from all instances in the data set
         for (int i = 0; i < m_trainingInstances.size(); i++) {
             tempDist = m_DistanceCalculator.distance(instance, m_trainingInstances.instance(i));
 
