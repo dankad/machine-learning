@@ -36,14 +36,15 @@ public class MainHW3 {
         Knn knn;
         double tempValError, valError = Integer.MAX_VALUE;
         int m_k = 0, lp = 0, maj = 0;
+        int[] numOfFolds = {trainingAutoPrice.size(), 50, 10, 5, 3};
 
         // uniform check of original data
         for (int i = 1; i <= 20; i++) {
             for (int j = 1; j <= 4; j++) {
-                for (int k = 1; k <= 10; k++) {
+                for (int k = 0; k < numOfFolds.length; k++) {
                     if (j == 4) {
-                        knn = new Knn(false, 0, true, i, false);
-                        tempValError = knn.crossValidationError(trainingAutoPrice, k);
+                        knn = new Knn(false, 1, true, i, false);
+                        tempValError = knn.crossValidationError(trainingAutoPrice, numOfFolds[k]);
                         if (tempValError < valError) {
                             valError = tempValError;
                             m_k = i;
@@ -52,11 +53,11 @@ public class MainHW3 {
                         }
                     } else {
                         knn = new Knn(false, j, false, i, false);
-                        tempValError = knn.crossValidationError(trainingAutoPrice, k);
+                        tempValError = knn.crossValidationError(trainingAutoPrice, numOfFolds[k]);
                         if (tempValError < valError) {
                             valError = tempValError;
                             m_k = i;
-                            lp = k;
+                            lp = j;
                             maj = 0;
                         }
                     }
@@ -67,10 +68,10 @@ public class MainHW3 {
         // weighted check of original data
         for (int i = 1; i <= 20; i++) {
             for (int j = 1; j <= 4; j++) {
-                for (int k = 1; k <= 10; k++) {
+                for (int k = 0; k < numOfFolds.length; k++) {
                     if (j == 4) {
-                        knn = new Knn(true, 0, true, i, false);
-                        tempValError = knn.crossValidationError(trainingAutoPrice, k);
+                        knn = new Knn(true, 1, true, i, false);
+                        tempValError = knn.crossValidationError(trainingAutoPrice, numOfFolds[k]);
                         if (tempValError < valError) {
                             valError = tempValError;
                             m_k = i;
@@ -79,11 +80,11 @@ public class MainHW3 {
                         }
                     } else {
                         knn = new Knn(true, j, false, i, false);
-                        tempValError = knn.crossValidationError(trainingAutoPrice, k);
+                        tempValError = knn.crossValidationError(trainingAutoPrice, numOfFolds[k]);
                         if (tempValError < valError) {
                             valError = tempValError;
                             m_k = i;
-                            lp = k;
+                            lp = j;
                             maj = 1;
                         }
                     }
@@ -94,10 +95,10 @@ public class MainHW3 {
         // uniform check of scaled data
         for (int i = 1; i <= 20; i++) {
             for (int j = 1; j <= 4; j++) {
-                for (int k = 1; k <= 10; k++) {
+                for (int k = 0; k < numOfFolds.length; k++) {
                     if (j == 4) {
-                        knn = new Knn(false, 0, true, i, false);
-                        tempValError = knn.crossValidationError(scaledTrainingAutoPrice, k);
+                        knn = new Knn(false, 1, true, i, false);
+                        tempValError = knn.crossValidationError(scaledTrainingAutoPrice, numOfFolds[k]);
                         if (tempValError < valError) {
                             valError = tempValError;
                             m_k = i;
@@ -106,11 +107,11 @@ public class MainHW3 {
                         }
                     } else {
                         knn = new Knn(false, j, false, i, false);
-                        tempValError = knn.crossValidationError(scaledTrainingAutoPrice, k);
+                        tempValError = knn.crossValidationError(scaledTrainingAutoPrice, numOfFolds[k]);
                         if (tempValError < valError) {
                             valError = tempValError;
                             m_k = i;
-                            lp = k;
+                            lp = j;
                             maj = 0;
                         }
                     }
@@ -121,10 +122,10 @@ public class MainHW3 {
         // weighted check of scaled data
         for (int i = 1; i <= 20; i++) {
             for (int j = 1; j <= 4; j++) {
-                for (int k = 1; k <= 10; k++) {
+                for (int k = 0; k < numOfFolds.length; k++) {
                     if (j == 4) {
-                        knn = new Knn(false, 0, true, i, false);
-                        tempValError = knn.crossValidationError(trainingAutoPrice, k);
+                        knn = new Knn(false, 1, true, i, false);
+                        tempValError = knn.crossValidationError(trainingAutoPrice, numOfFolds[k]);
                         if (tempValError < valError) {
                             valError = tempValError;
                             m_k = i;
@@ -133,11 +134,11 @@ public class MainHW3 {
                         }
                     } else {
                         knn = new Knn(false, j, false, i, false);
-                        tempValError = knn.crossValidationError(trainingAutoPrice, k);
+                        tempValError = knn.crossValidationError(trainingAutoPrice, numOfFolds[k]);
                         if (tempValError < valError) {
                             valError = tempValError;
                             m_k = i;
-                            lp = k;
+                            lp = j;
                             maj = 1;
                         }
                     }
