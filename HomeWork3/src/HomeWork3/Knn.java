@@ -30,7 +30,7 @@ class DistanceCalculator {
     public double distance(Instance one, Instance two) {
         double result = 0;
         if (!m_Infinity && !m_Efficient) {
-            result = lpDistance(one, two);
+        	  result = lpDistance(one, two);
         } else if (m_Infinity && !m_Efficient) {
             result = lInfinityDistance(one, two);
         } else if (!m_Infinity && m_Efficient) {
@@ -48,13 +48,14 @@ class DistanceCalculator {
      * @param two
      */
     private double lpDistance(Instance one, Instance two) {
-        double[] oneValues = one.toDoubleArray();
+       
+    	double[] oneValues = one.toDoubleArray();
         double[] twoValues = two.toDoubleArray();
         double sumLp = 0;
         for (int i = 0; i < one.numAttributes(); i++) {
             sumLp += Math.pow((oneValues[i] - twoValues[i]), m_PValue);
         }
-        return Math.pow(sumLp, 1 / m_PValue);
+        return Math.pow(sumLp, 1 / (double)m_PValue);
     }
 
     /**
@@ -94,7 +95,7 @@ class DistanceCalculator {
                 break;
             }
         }
-        return Math.pow(sumLp, 1 / m_PValue);
+        return Math.pow(sumLp, 1 / (double)m_PValue);
     }
 
     /**
@@ -124,7 +125,7 @@ public class Knn implements Classifier {
 
     //public enum DistanceCheck{Regular, Efficient}
 
-    private Instances m_trainingInstances;
+    public Instances m_trainingInstances;
     private boolean useWeight;
 
     //all distances related fields
@@ -161,8 +162,9 @@ public class Knn implements Classifier {
      * @return The instance predicted value.
      */
     public double regressionPrediction(Instance instance) {
-        int[] kNearestIndex = findNearestNeighbors(instance);
-        System.out.println("k index is: " + kNearestIndex[0]);
+      
+    	int[] kNearestIndex = findNearestNeighbors(instance);
+       // System.out.println("k index is: " + kNearestIndex[0]);
         double answer;
 
         //use average class or weighted method to calculate class
@@ -182,14 +184,8 @@ public class Knn implements Classifier {
     public double calcAvgError(Instances instances) {
         double numberOfErrors = 0;
         for (int i = 0; i < instances.size(); i++) {
-            System.out.println("regressionPrediction is " + regressionPrediction(instances.get(i)));
-            System.out.println("class value: " + instances.get(i).classValue());
-            if (regressionPrediction(instances.get(i)) != instances.get(i).classValue()) {
-                numberOfErrors++;
-            }
+              numberOfErrors += Math.abs(instances.get(i).classValue() - regressionPrediction(instances.get(i)));  
         }
-        System.out.println("Number of errors: " + numberOfErrors);
-        System.out.println("Instances size: " + instances.size());
         return numberOfErrors / instances.size();
     }
 
@@ -232,10 +228,15 @@ public class Knn implements Classifier {
      * @param instance
      */
     public int[] findNearestNeighbors(Instance instance) {
+    	
+    	
         double[][] distForNeighbors = new double[m_trainingInstances.size()][2];
         double tempDist;
         int[] nearestNeighbors = new int[m_k];
-
+        
+        System.out.println("length of distfor-- " + distForNeighbors.length);
+        System.out.println("k val -" + m_k);
+        
         //for loop insert max size for all instances - relevant for efficient
         for (int i = 0; i < m_trainingInstances.size(); i++) {
             distForNeighbors[i][1] = Double.MAX_VALUE;
@@ -244,7 +245,7 @@ public class Knn implements Classifier {
         // calculate the distance of @instance from all instances in the data set
         for (int i = 0; i < m_trainingInstances.size(); i++) {
             tempDist = m_DistanceCalculator.distance(instance, m_trainingInstances.instance(i));
-
+           
             //if the efficient flag is up after every calculation up date threshold
             if (m_Efficient) {
                 int n = m_trainingInstances.size();
